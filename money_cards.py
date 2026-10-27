@@ -139,6 +139,9 @@ def slide1(series, candles):
     word = "ירד" if ch < 0 else "עלה"
     date_txt = f"השער היציג של יום {DAYS[d.weekday()]}, {d.day} ב{MONTHS[d.month - 1]}"
     since = f"מיום {DAYS[series[-2][0].weekday()]}"
+    _, v30 = value_on_or_before(series, d - timedelta(days=30))
+    ch30 = (rate / v30 - 1) * 100
+    month_txt = f"ובחודש האחרון: {'ירד' if ch30 < 0 else 'עלה'} {abs(ch30):.1f}% (היה {v30:.3f})"
     return page(f"""
 <div class="abs sub" style="top:72px;right:72px">{date_txt}</div>
 <h1 class="abs" style="top:132px;right:72px">כמה עולה דולר?</h1>
@@ -147,9 +150,10 @@ def slide1(series, candles):
 <div class="abs" style="top:430px;right:72px;display:flex;align-items:center;gap:18px">
   <span class="ltr" style="background:{SUN};font-weight:800;font-size:40px;padding:6px 24px 8px;border-radius:40px">{arrow} {abs(ch):.2f}%</span>
   <span style="font-size:36px;font-weight:500">{word} {since}</span></div>
-<div class="abs" style="top:572px;right:72px;left:72px;display:flex;justify-content:space-between;font-size:30px;color:{MUTE};font-weight:500">
+<div class="abs" style="top:520px;right:72px;font-size:34px;font-weight:700;color:{COBALT}">{month_txt}</div>
+<div class="abs" style="top:590px;right:72px;left:72px;display:flex;justify-content:space-between;font-size:30px;color:{MUTE};font-weight:500">
   <span>נרות שבועיים, כשלושה חודשים</span><span>מלא: עלה. ריק: ירד.</span></div>
-<div class="abs ltr" style="top:640px;left:72px">{candles_svg(candles)}</div>
+<div class="abs ltr" style="top:655px;left:72px">{candles_svg(candles, h=520)}</div>
 <div class="abs" style="top:1322px;display:none"></div>""", 0)
 
 
@@ -161,23 +165,27 @@ def slide2(series):
     for title, usd, kind in rows:
         now_v, old_v = usd * rate, usd * old
         diff = now_v - old_v
-        cheaper = diff < 0
-        good = cheaper if kind == "buy" else not cheaper
         if abs(diff) < 0.5:
-            line, color = "כמעט בלי שינוי לעומת לפני חודש", MUTE
+            line, color = "כמעט בלי שינוי", MUTE
         else:
-            verb = ("זול" if cheaper else "יקר") if kind == "buy" else ("מקבלים פחות" if cheaper else "מקבלים יותר")
-            line = (f"{verb} ב־₪{abs(diff):,.0f} לעומת לפני חודש" if kind == "buy"
-                    else f"{verb} ב־₪{abs(diff):,.0f} לעומת לפני חודש")
+            more = diff > 0
+            amount = f"₪{abs(diff):,.0f}"
+            if kind == "buy":
+                line, good = f"אותו דבר עולה לך {amount} " + ("יותר" if more else "פחות"), not more
+            else:
+                line, good = f"אתה מקבל {amount} " + ("יותר" if more else "פחות"), more
             color = COBALT if good else WARN
-        out.append(f"""<div style="padding:34px 0;border-top:3px solid {GRID}">
-  <div style="display:flex;justify-content:space-between;align-items:baseline">
+        out.append(f"""<div style="padding:30px 0 26px;border-top:3px solid {GRID}">
+  <div style="display:flex;justify-content:space-between;align-items:center">
     <div><div style="font-size:46px;font-weight:700">{title}</div><div style="font-size:32px;color:{MUTE};font-weight:500">{usd:,} דולר</div></div>
-    <div class="ltr" style="font-size:72px;font-weight:800;line-height:1">₪{now_v:,.0f}</div></div>
-  <div style="margin-top:12px;font-size:34px;font-weight:700;color:{color}">{line}</div></div>""")
+    <div style="text-align:left;direction:rtl">
+      <div style="font-size:28px;color:{MUTE};font-weight:500">היום</div>
+      <div style="font-size:72px;font-weight:800;line-height:1.05">₪{now_v:,.0f}</div>
+      <div style="font-size:30px;color:{MUTE};font-weight:500">לפני חודש: ₪{old_v:,.0f}</div></div></div>
+  <div style="margin-top:10px;font-size:36px;font-weight:800;color:{color}">{line}</div></div>""")
     return page(f"""
 <h1 class="abs" style="top:100px;right:72px;left:72px">מה זה אומר לכיס שלך?</h1>
-<div class="abs sub" style="top:214px;right:72px">אותו סכום בדולרים, בשקלים</div>
+<div class="abs sub" style="top:214px;right:72px">אותו סכום בדולרים: היום מול לפני חודש</div>
 <div class="abs" style="top:330px;right:72px;left:72px">{''.join(out)}</div>
 <div class="abs" style="bottom:120px;right:72px;left:72px;font-size:26px;color:{MUTE}">חישוב לפי השער היציג של בנק ישראל. הסבר כללי, לא ייעוץ.</div>""", 1)
 
