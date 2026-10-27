@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import date, timedelta
 from string import Template
 
@@ -28,11 +29,24 @@ MONTHS_SHORT = ["ינו׳", "פבר׳", "מרץ", "אפר׳", "מאי", "יונ�
 INK, PAPER, COBALT, SUN, MUTE, GRID, WARN = "#101A3A", "#EEF2F8", "#2F4BFF", "#FFD23F", "#6B7699", "#D3DAEA", "#D9381E"
 
 
-def fetch():
-    r = requests.get(URL, timeout=30)
-    r.raise_for_status()
-    rows = list(csv.DictReader(io.StringIO(r.text)))
-    return [(date.fromisoformat(x["TIME_PERIOD"]), float(x["OBS_VALUE"])) for x in rows]
+def fetch(attempts=5):
+    """Bank of Israel's API is sometimes slow from cloud runners, so retry with backoff."""
+    last = None
+    for i in range(attempts):
+        try:
+            r = requests.get(URL, timeout=25)
+            r.raise_for_status()
+            rows = list(csv.DictReader(io.StringIO(r.text)))
+            return [(date.fromisoformat(x["TIME_PERIOD"]), float(x["OBS_VALUE"])) for x in rows]
+        except requests.RequestException as e:
+            last = e
+            time.sleep(5 * (i + 1))
+    raise last
+
+
+def paths_for(series, out_dir="out"):
+    tag = series[-1][0].isoformat()
+    return [os.path.join(out_dir, f"money_{tag}_{i}.png") for i in (1, 2, 3)]
 
 
 def value_on_or_before(series, d):
@@ -223,12 +237,9 @@ def build(out_dir="out", series=None):
     os.makedirs(out_dir, exist_ok=True)
     series = series or fetch()
     candles = weekly_candles(series)
-    tag = series[-1][0].isoformat()
-    paths = []
-    for i, html in enumerate([slide1(series, candles), slide2(series), slide3(series, candles)], 1):
-        p = os.path.join(out_dir, f"money_{tag}_{i}.png")
+    paths = paths_for(series, out_dir)
+    for p, html in zip(paths, [slide1(series, candles), slide2(series), slide3(series, candles)]):
         render(html, p)
-        paths.append(p)
     return paths, series
 
 

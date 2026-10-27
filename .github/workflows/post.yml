@@ -24,6 +24,7 @@ jobs:
           git push || true
       - name: Post to Instagram
         env:
+          USE_SERIES_CACHE: "1"
           IG_USER_ID: "17841415780467671"
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IMAGE_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/out
