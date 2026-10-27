@@ -127,8 +127,8 @@ h1{{font-family:'Secular One',sans-serif;font-weight:400;font-size:88px;line-hei
 
 
 def page(body, step):
-    dots = "".join(f'<i class="{"on" if i == step else ""}"></i>' for i in range(3))
-    return f'<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><style>{CSS}</style></head><body>{body}<div class="dots">{dots}</div></body></html>'
+    # Instagram draws its own page dots on carousels, so none are drawn here.
+    return f'<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><style>{CSS}</style></head><body>{body}</body></html>'
 
 
 def slide1(series, candles):
@@ -137,7 +137,8 @@ def slide1(series, candles):
     ch = (rate / prev - 1) * 100
     arrow = "▼" if ch < 0 else "▲"
     word = "ירד" if ch < 0 else "עלה"
-    date_txt = f"יום {DAYS[d.weekday()]}, {d.day} ב{MONTHS[d.month - 1]}"
+    date_txt = f"השער היציג של יום {DAYS[d.weekday()]}, {d.day} ב{MONTHS[d.month - 1]}"
+    since = f"מיום {DAYS[series[-2][0].weekday()]}"
     return page(f"""
 <div class="abs sub" style="top:72px;right:72px">{date_txt}</div>
 <h1 class="abs" style="top:132px;right:72px">כמה עולה דולר?</h1>
@@ -145,7 +146,7 @@ def slide1(series, candles):
   <span style="font-size:132px;line-height:1;letter-spacing:-2px">{rate:.3f}</span><span style="font-size:64px;color:{COBALT}">₪</span></div>
 <div class="abs" style="top:430px;right:72px;display:flex;align-items:center;gap:18px">
   <span class="ltr" style="background:{SUN};font-weight:800;font-size:40px;padding:6px 24px 8px;border-radius:40px">{arrow} {abs(ch):.2f}%</span>
-  <span style="font-size:36px;font-weight:500">{word} מאתמול</span></div>
+  <span style="font-size:36px;font-weight:500">{word} {since}</span></div>
 <div class="abs" style="top:572px;right:72px;left:72px;display:flex;justify-content:space-between;font-size:30px;color:{MUTE};font-weight:500">
   <span>נרות שבועיים, כשלושה חודשים</span><span>מלא: עלה. ריק: ירד.</span></div>
 <div class="abs ltr" style="top:640px;left:72px">{candles_svg(candles)}</div>
@@ -193,9 +194,9 @@ def slide3(series, candles):
     avg = sum(moves) / len(moves)
     today = moves[-1]
     ratio = today / avg if avg else 1
-    today_txt = (f"התנועה של היום, {today:.2f}%, חזקה פי {ratio:.1f} מהרגיל." if ratio >= 1.5
-                 else f"התנועה של היום, {today:.2f}%, בטווח הרגיל." if ratio >= 0.5
-                 else f"היום השער כמעט לא זז, {today:.2f}%.")
+    today_txt = (f"התנועה האחרונה, {today:.2f}%, חזקה פי {ratio:.1f} מהרגיל." if ratio >= 1.5
+                 else f"התנועה האחרונה, {today:.2f}%, בטווח הרגיל." if ratio >= 0.5
+                 else f"בשער האחרון כמעט לא היה שינוי, {today:.2f}%.")
     marker = (1 - pos) * 100
     return page(f"""
 <h1 class="abs" style="top:100px;right:72px;left:72px">מה הנתונים אומרים?</h1>
@@ -247,8 +248,8 @@ def caption(series):
     d, rate = series[-1]
     ch = (rate / series[-2][1] - 1) * 100
     arrow = "▼" if ch < 0 else "▲"
-    return (f"הדולר עומד על {rate:.3f} ₪ ({arrow} {abs(ch):.2f}% מאתמול).\n\n"
-            "גוללים הצידה: מה זה אומר לכיס שלך, ומה הנתונים אומרים.\n\n"
+    prev_day = DAYS[series[-2][0].weekday()]
+    return (f"הדולר עומד על {rate:.3f} ₪ ({arrow} {abs(ch):.2f}% מיום {prev_day}).\n\n"
             "מקור: בנק ישראל, שער יציג. הסבר כללי, לא ייעוץ השקעות.\n\n"
             "#דולר #שערהדולר #כסף #חיסכון #כלכלה")
 
