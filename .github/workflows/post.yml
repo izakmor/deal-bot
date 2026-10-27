@@ -17,18 +17,17 @@ jobs:
       - run: pip install -r requirements.txt
       - name: Render the carousel and commit the images (gives them a public URL)
         run: |
-          python money_main.py --render-only
+          python content_main.py --render-only
           git config user.name "money-bot"
           git config user.email "money-bot@users.noreply.github.com"
           git add out && git commit -m "carousel images" || true
           git push || true
       - name: Post to Instagram
         env:
-          USE_SERIES_CACHE: "1"
           IG_USER_ID: "17841415780467671"
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IMAGE_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/out
-        run: python money_main.py
+        run: python content_main.py
       - name: Save posted list
         run: |
           git add posted.json && git commit -m "posted" || true
