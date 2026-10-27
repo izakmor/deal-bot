@@ -1,0 +1,4 @@
+pillow
+requests
+feedparser
+python-bidi
