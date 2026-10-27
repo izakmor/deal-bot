@@ -4,7 +4,7 @@ import os
 import time
 import requests
 
-API = "https://graph.facebook.com/v21.0"
+API = "https://graph.instagram.com/v21.0"  # token comes from "API setup with Instagram login"
 
 
 def post_image(image_url, caption):
