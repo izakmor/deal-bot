@@ -179,7 +179,7 @@ def pile(level):
 def coffee_story(price=18, per_year=365, rate=0.04, home=4, home_days_week=3):
     month, year, ten = price * per_year / 12, price * per_year, price * per_year * 10
     grown = fv_monthly(month, rate, 10)
-    save = home_days_week * 52 * (price - home)
+    save = home_days_week * (per_year / 7) * (price - home)
     N = 9
     sl = lambda *a, **k: slide(*a, series="הרגלים קטנים", **k)
     title = "כמה הקפה של הבוקר עולה לך באמת?"
@@ -214,10 +214,10 @@ def coffee_story(price=18, per_year=365, rate=0.04, home=4, home_days_week=3):
            f"הריבית הייתה מוסיפה {money(grown - ten)}.</p>",
            foot="התשואה היא דוגמה, לא הבטחה. בפועל היא משתנה, ויכולות להיות גם שנים של הפסד."),
         sl(8, N, "אפשר גם בלי לוותר על הכול",
-           f"<p>אם מחליפים רק {home_days_week} ימים בשבוע בקפה בבית, ב־{home} שקלים, חוסכים בערך "
+           f"<p>אם מחליפים רק {home_days_week} ימים בשבוע בקפה בבית שעולה {home} שקלים, חוסכים בערך "
            f"<b style='font-weight:800'>{money(save)}</b> בשנה.</p>"
            f"<p style='font-size:36px;opacity:.8'>ועדיין נשאר קפה בחוץ ארבעה ימים בשבוע.</p>",
-           bars(year, year - save, "כל יום בחוץ", f"{7 - home_days_week} ימים בחוץ"), art_bottom=150),
+           bars(year, year - save, "כל יום בחוץ", f"{home_days_week} ימים בבית"), art_bottom=150),
         sl(9, N, "מה לוקחים מזה?",
            "<p><b style='font-weight:800'>הרגל קטן הוא לא קטן.</b> הוא רק נראה ככה ביום אחד.</p>"
            "<p><b style='font-weight:800'>לא צריך לוותר על כלום.</b> מספיק לדעת כמה זה עולה, ולהחליט.</p>"
