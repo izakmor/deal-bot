@@ -1,6 +1,7 @@
 """30+ story carousels (9 slides each) built from parameterised templates.
 Every number is computed here. Importing this module registers the stories into
 story_cards.STORIES in the final publishing order."""
+import story_art as A
 import story_cards as sc
 from story_cards import bars, cards, chips, money, pile, hero_art
 
@@ -22,34 +23,34 @@ def bold(t):
 
 
 # ---------------------------------------------------------------- habits
-def habit_story(unit, price, per_year, freq, title, sub, alt_sentence, alt_price, alt_share, alt_foot, rate=0.07, hero=None):
+def habit_story(unit, price, per_year, freq, title, sub, alt_sentence, alt_price, alt_share, alt_foot, rate=0.07, icon="cup"):
     month, year, ten = price * per_year / 12, price * per_year, price * per_year * 10
     grown = sc.fv_monthly(month, rate, 10)
     save = per_year * alt_share * (price - alt_price)
     sl = S("הרגלים קטנים")
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', hero or pile(3), art_bottom=150, title_size=tsize(title)),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.scene_hero(icon), art_bottom=150, title_size=tsize(title)),
         sl(2, N, "קודם, ההנחות",
            chips(("מחיר", money(price)), ("כמה", freq), ("תקופה", "10 שנים")) +
            "<p>לא נבקש ממך לוותר על כלום. רק להסתכל על המספר.</p><p>כל מספר בהמשך מחושב מהנתונים האלה.</p>",
            foot="הנתונים הם דוגמה. כל אחד ישנה אותם לפי ההרגל שלו.", top=340),
         sl(3, N, "בפעם אחת זה לא מרגיש",
            cards((f"כל {unit}", money(price)), ("בחודש", money(month))) +
-           f"<p>{money(month)} בחודש. לא סכום שעוצר אותך באמצע.</p>", pile(1), art_bottom=150),
+           f"<p>{money(month)} בחודש. לא סכום שעוצר אותך באמצע.</p>", A.scene_single(icon), art_bottom=150),
         sl(4, N, "בשנה כבר רואים משהו",
            cards(("בשנה", money(year)), ("בשנתיים", money(year * 2))) +
-           f"<p>{money(year)} בשנה, על משהו שהפך להרגל.</p>", pile(2), art_bottom=150),
+           f"<p>{money(year)} בשנה, על משהו שהפך להרגל.</p>", A.scene_grid(icon), art_bottom=150),
         sl(5, N, "בשלוש שנים זה סכום",
            cards(("אחרי 3 שנים", money(year * 3)), ("בחודש", money(month))) +
-           f"<p>{money(year * 3)}. אותו הרגל, רק עם יותר אפסים.</p>", pile(3), art_bottom=150),
+           f"<p>{money(year * 3)}. אותו הרגל, רק עם יותר אפסים.</p>", A.scene_pyramid(icon), art_bottom=150),
         sl(6, N, "בעשר שנים מגיע המספר",
            cards(("אחרי 10 שנים", money(ten)), ("בשנה", money(year))) +
-           f"<p>{money(ten)}. זה הסכום שעבר מהכיס שלך, בלי שהרגשת.</p>", pile(4), art_bottom=150),
+           f"<p>{money(ten)}. זה הסכום שעבר מהכיס שלך, בלי שהרגשת.</p>", A.scene_mountain(icon), art_bottom=130),
         sl(7, N, "ואם הכסף הזה היה עובד?",
            cards(("הפקדת", money(ten)), ("יש לך", money(grown))) +
            f"<p>אם היית מפקיד את אותו סכום כל חודש, בתשואה לדוגמה של {rate * 100:.0f}% בשנה, "
            f"הריבית הייתה מוסיפה {money(grown - ten)}.</p>",
-           foot=f"התשואה היא דוגמה, לא הבטחה. {rate * 100:.0f}% בשנה היא הנחה אופטימית, ובפועל יכולות להיות גם שנים של הפסד."),
+           sc.sprout_coin(), art_bottom=210, foot=f"התשואה היא דוגמה, לא הבטחה. {rate * 100:.0f}% בשנה היא הנחה אופטימית, ובפועל יכולות להיות גם שנים של הפסד."),
         sl(8, N, "אפשר גם בלי לוותר על הכול",
            f"<p>{alt_sentence.format(save=bold(money(save)))}</p>",
            bars(year, year - save, "כמו היום", "אחרי ההחלפה"), art_bottom=150),
@@ -110,23 +111,23 @@ def inflation_story(rate, amount, title, sub):
     need = lambda y: amount * (1 + rate) ** y
     sl = S("אינפלציה")
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', pile(3), art_bottom=150, title_size=tsize(title)),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.scene_basket_tag(), art_bottom=150, title_size=tsize(title)),
         sl(2, N, "קודם, ההנחה",
            chips(("סכום היום", money(amount)), ("אינפלציה לדוגמה", f"{rate * 100:.0f}% בשנה"), ("תקופה", "30 שנה")) +
            "<p>אינפלציה היא עלייה כללית במחירים. אותו סכום קונה פחות עם הזמן.</p>",
            foot="האינפלציה האמיתית משתנה משנה לשנה. כאן היא קבועה, לצורך הדוגמה.", top=340),
         sl(3, N, "אחרי 5 שנים עוד לא מרגישים",
            cards(("היום", money(amount)), ("אחרי 5 שנים", money(f(5)))) +
-           f"<p>אותו כסף קונה בערך {money(f(5))} במחירים של היום.</p>", pile(1), art_bottom=150),
+           f"<p>אותו כסף קונה בערך {money(f(5))} במחירים של היום.</p>", A.scene_basket(f(5) / amount), art_bottom=150),
         sl(4, N, "אחרי 10 שנים זה בולט",
            cards(("היום", money(amount)), ("אחרי 10 שנים", money(f(10)))) +
-           f"<p>כוח הקנייה ירד ל־{f(10) / amount * 100:.0f}% ממה שהיה.</p>", pile(2), art_bottom=150),
+           f"<p>כוח הקנייה ירד ל־{f(10) / amount * 100:.0f}% ממה שהיה.</p>", A.scene_basket(f(10) / amount), art_bottom=150),
         sl(5, N, "אחרי 20 שנה אפשר לראות את זה בסופר",
            cards(("היום", money(amount)), ("אחרי 20 שנה", money(f(20)))) +
-           f"<p>נשארו {f(20) / amount * 100:.0f}% מכוח הקנייה המקורי.</p>", pile(3), art_bottom=150),
+           f"<p>נשארו {f(20) / amount * 100:.0f}% מכוח הקנייה המקורי.</p>", A.scene_basket(f(20) / amount), art_bottom=150),
         sl(6, N, f"אחרי 30 שנה נשאר רק {f(30) / amount * 100:.0f}%",
            cards(("היום", money(amount)), ("אחרי 30 שנה", money(f(30)))) +
-           f"<p>במחירים של היום, הסכום הזה שווה רק {money(f(30))}.</p>", pile(4), art_bottom=150),
+           f"<p>במחירים של היום, הסכום הזה שווה רק {money(f(30))}.</p>", A.scene_basket(f(30) / amount), art_bottom=150),
         sl(7, N, "ומה צריך כדי לשמור על הערך?",
            cards(("היום", money(amount)), ("בעוד 20 שנה", money(need(20)))) +
            f"<p>כדי לקנות בעוד 20 שנה את מה שהסכום קונה היום, צריך כ־{money(need(20))}.</p>",
@@ -148,20 +149,20 @@ def fees_story(principal, gross, years, title, sub):
     v = [principal * (1 + gross - f) ** years for f in levels]
     sl = S("עמלות")
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', hero_art(), art_bottom=150, title_size=tsize(title)),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.coin_bite(), art_bottom=150, title_size=tsize(title)),
         sl(2, N, "קודם, ההנחות",
            chips(("סכום", money(principal)), ("תשואה לפני עמלה", f"{gross * 100:.0f}% בשנה"), ("תקופה", f"{years} שנה")) +
            "<p>אותה השקעה. ההבדל היחיד הוא כמה משלמים כל שנה על ניהול.</p>",
            foot="דמי ניהול משתנים בין מוצרים. כאן הם קבועים, לצורך הדוגמה.", top=340),
         sl(3, N, "עמלה של חצי אחוז",
            cards(("הפקדת", money(principal)), (f"אחרי {years} שנה", money(v[0]))) +
-           f"<p>עם עמלה של 0.5% בשנה, הסכום מגיע ל־{money(v[0])}.</p>", sc.tree(1), art_bottom=150),
+           f"<p>עם עמלה של 0.5% בשנה, הסכום מגיע ל־{money(v[0])}.</p>", sc.tree(3), art_bottom=150),
         sl(4, N, "עמלה של אחוז",
            cards(("הפקדת", money(principal)), (f"אחרי {years} שנה", money(v[1]))) +
            f"<p>עם עמלה של 1% בשנה: {money(v[1])}. כבר {money(v[0] - v[1])} פחות.</p>", sc.tree(2), art_bottom=150),
         sl(5, N, "עמלה של שני אחוזים",
            cards(("הפקדת", money(principal)), (f"אחרי {years} שנה", money(v[2]))) +
-           f"<p>עם עמלה של 2% בשנה: {money(v[2])}.</p>", sc.tree(3), art_bottom=150),
+           f"<p>עם עמלה של 2% בשנה: {money(v[2])}.</p>", sc.tree(1), art_bottom=150),
         sl(6, N, "ההפרש הכולל",
            cards(("ההפרש", money(v[0] - v[2])), ("באחוז", f"{(1 - v[2] / v[0]) * 100:.0f}%")) +
            f"<p>הפער בין 0.5% ל־2% הוא {money(v[0] - v[2])}, על אותה השקעה בדיוק.</p>"),
@@ -184,7 +185,7 @@ def emergency_story(expense, title, sub):
     sl = S("קרן חירום")
     m3, m6 = expense * 3, expense * 6
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', pile(3), art_bottom=150, title_size=tsize(title)),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.umbrella(2), art_bottom=150, title_size=tsize(title)),
         sl(2, N, "מה זה קרן חירום?",
            "<p>כסף שמחכה בצד לדברים שלא תכננת: אובדן עבודה, תיקון דחוף, הוצאה רפואית.</p>"
            "<p>המטרה היא לא להרוויח ממנו, אלא שלא תהיה חייב ללוות כשזה קורה.</p>",
@@ -194,13 +195,13 @@ def emergency_story(expense, title, sub):
            "<p>הנתון החשוב הוא ההוצאות, לא ההכנסה. הוא קובע כמה זמן הכסף יחזיק.</p>", top=340),
         sl(4, N, "חודש אחד",
            cards(("הוצאות", money(expense)), ("מספיק ל", "חודש")) +
-           "<p>זה מה שצריך כדי לעבור חודש בלי הכנסה.</p>", pile(1), art_bottom=150),
+           "<p>זה מה שצריך כדי לעבור חודש בלי הכנסה.</p>", A.umbrella(1), art_bottom=150),
         sl(5, N, "שלושה חודשים",
            cards(("סכום", money(m3)), ("מספיק ל", "3 חודשים")) +
-           "<p>זה הרף התחתון של כלל האצבע הנפוץ.</p>", pile(2), art_bottom=150),
+           "<p>זה הרף התחתון של כלל האצבע הנפוץ.</p>", A.umbrella(2), art_bottom=150),
         sl(6, N, "שישה חודשים",
            cards(("סכום", money(m6)), ("מספיק ל", "6 חודשים")) +
-           "<p>זה הרף העליון של אותו כלל, למי שרוצה יותר ביטחון.</p>", pile(4), art_bottom=150),
+           "<p>זה הרף העליון של אותו כלל, למי שרוצה יותר ביטחון.</p>", A.umbrella(4), art_bottom=150),
         sl(7, N, "איך בונים את זה?",
            cards(("בחודש", money(m3 / 12)), ("אחרי שנה", money(m3))) +
            f"<p>אם מפקידים {money(m3 / 12)} בחודש, אחרי שנה יש שלושה חודשי הוצאות בצד.</p>",
@@ -222,24 +223,24 @@ def budget_story(income, title, sub):
     f10 = sc.fv_monthly(sav, 0.05, 10)
     h10 = sc.fv_monthly(income * 0.1, 0.05, 10)
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', pile(3), art_bottom=150, title_size=tsize(title)),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.pie(), art_bottom=150, title_size=tsize(title)),
         sl(2, N, "הכלל בשורה אחת",
            "<p>חמישים אחוז לצרכים, שלושים אחוז לרצונות ועשרים אחוז לחיסכון.</p>"
            "<p>זה כלל אצבע נפוץ, לא חוק. כל אחד מתאים אותו לעצמו.</p>",
            foot=f"הדוגמה: משכורת נטו של {money(income)}.", top=340),
         sl(3, N, "חמישים אחוז: צרכים",
            cards(("בחודש", money(need)), ("מהמשכורת", "50%")) +
-           "<p>דיור, חשבונות, אוכל, תחבורה. מה שחייבים לשלם כדי לחיות.</p>", pile(2), art_bottom=150),
+           "<p>דיור, חשבונות, אוכל, תחבורה. מה שחייבים לשלם כדי לחיות.</p>", A.pie(0), art_bottom=150),
         sl(4, N, "שלושים אחוז: רצונות",
            cards(("בחודש", money(want)), ("מהמשכורת", "30%")) +
-           "<p>בילויים, קניות, מנויים. מה שאפשר גם בלעדיו, אבל נעים שיש.</p>", pile(2), art_bottom=150),
+           "<p>בילויים, קניות, מנויים. מה שאפשר גם בלעדיו, אבל נעים שיש.</p>", A.pie(1), art_bottom=150),
         sl(5, N, "עשרים אחוז: חיסכון",
            cards(("בחודש", money(sav)), ("מהמשכורת", "20%")) +
-           "<p>קרן חירום, חיסכון לטווח ארוך, החזר חובות.</p>", pile(3), art_bottom=150),
+           "<p>קרן חירום, חיסכון לטווח ארוך, החזר חובות.</p>", A.pie(2), art_bottom=150),
         sl(6, N, "מה זה עושה בעשר שנים?",
            cards(("הפקדת", money(sav * 120)), ("יש לך", money(f10))) +
            f"<p>{money(sav)} בחודש, בתשואה לדוגמה של 5% בשנה, מגיעים ל־{money(f10)}.</p>",
-           pile(4), art_bottom=150),
+           sc.sprout_coin(), art_bottom=170),
         sl(7, N, "ואם זה לא מסתדר?",
            "<p>לא כולם יכולים עשרים אחוז. זה בסדר.</p>"
            "<p>אפשר להתחיל מעשרה אחוז, ולהעלות כשיש עוד מקום.</p>",
@@ -262,23 +263,23 @@ def hourly_story(net, title, sub):
     sl = S("זמן וכסף")
     year_coffee = 18 * 365
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', pile(3), art_bottom=150, title_size=tsize(title)),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.clock(10 + 10 / 60), art_bottom=150, title_size=tsize(title)),
         sl(2, N, "קודם, מה שווה שעה שלך",
            chips(("משכורת נטו", money(net)), ("שעות בחודש", "182"), ("שעה", money(rate))) +
            "<p>זה חישוב מקורב. הוא נותן דרך אחרת להסתכל על מחירים.</p>",
            foot="182 שעות עבודה בחודש הן הנחה מקובלת. כל אחד ישנה לפי המצב שלו.", top=340),
         sl(3, N, "קפה ומשלוח",
            cards(("קפה, 18 ש\"ח", fmt(cost(18))), ("משלוח, 85 ש\"ח", fmt(cost(85)))) +
-           "<p>בדקות עבודה, אלה עדיין דברים קטנים.</p>", pile(1), art_bottom=150),
+           "<p>בדקות עבודה, אלה עדיין דברים קטנים.</p>", A.clock(cost(85)), art_bottom=150),
         sl(4, N, "נעליים וטלפון",
            cards(("נעליים, 400 ש\"ח", fmt(cost(400))), ("טלפון, 3,000 ש\"ח", fmt(cost(3000)))) +
-           "<p>כאן כבר מדברים על שעות ועל ימי עבודה.</p>", pile(2), art_bottom=150),
+           "<p>כאן כבר מדברים על שעות ועל ימי עבודה.</p>", A.clock(cost(3000)), art_bottom=150),
         sl(5, N, "חופשה",
            cards(("חופשה, 8,000 ש\"ח", f"{cost(8000) / 8:.1f} ימים"), ("בשעות", f"{cost(8000):.0f}")) +
-           f"<p>חופשה של 8,000 שקלים שווה בערך {cost(8000) / 8:.1f} ימי עבודה (ביום של 8 שעות).</p>", pile(3), art_bottom=150),
+           f"<p>חופשה של 8,000 שקלים שווה בערך {cost(8000) / 8:.1f} ימי עבודה (ביום של 8 שעות).</p>", sc.calendar_art(), art_bottom=150),
         sl(6, N, "ההרגל היומי",
            cards(("קפה כל יום, בשנה", money(year_coffee)), ("בשעות עבודה", f"{cost(year_coffee):.0f}")) +
-           f"<p>קפה כל יום לאורך שנה הוא בערך {cost(year_coffee) / 8:.0f} ימי עבודה.</p>", pile(4), art_bottom=150),
+           f"<p>קפה כל יום לאורך שנה הוא בערך {cost(year_coffee) / 8:.0f} ימי עבודה.</p>", sc.coin_mountain(), art_bottom=130),
         sl(7, N, "למה זה שימושי?",
            "<p>כסף הוא זמן שהשקעת כדי להשיג אותו.</p><p>זה לא אומר להפסיק לקנות. זה עוזר לבחור על מה שווה לעבוד.</p>",
            foot="חישוב מקורב לפי הנחה על שעות עבודה.", top=340),
@@ -298,7 +299,7 @@ def rule72_story():
     sl = S("ריבית דריבית")
     yrs = lambda r: 72 / r
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', hero_art(), art_bottom=150, title_size=100),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.coin_pair(), art_bottom=150, title_size=100),
         sl(2, N, "הכלל",
            "<p>מחלקים 72 בריבית השנתית.</p><p>התוצאה היא בערך מספר השנים עד שהכסף מוכפל.</p>",
            foot="קירוב מקובל, לא חישוב מדויק. ההנחה: ריבית קבועה.", top=340),
@@ -316,7 +317,7 @@ def rule72_story():
            "<p>ריבית גבוהה כזאת היא הנחה אופטימית, אבל היא מראה את ההבדל.</p>", sc.tree(3), art_bottom=150),
         sl(7, N, "וזה עובד גם הפוך",
            cards(("אינפלציה של 3%", f"{yrs(3):.0f} שנים"), ("מחירים", "מוכפלים")) +
-           "<p>באינפלציה של 3% בשנה, מחירים מכפילים את עצמם בערך ב־24 שנה.</p>"),
+           "<p>באינפלציה של 3% בשנה, מחירים מכפילים את עצמם בערך ב־24 שנה.</p>", A.scene_basket(0.5), art_bottom=150),
         sl(8, N, "בתמונה אחת",
            "<p>כמה שנים צריך לכל ריבית.</p>", bars(yrs(2), yrs(8), "ריבית 2%", "ריבית 8%"), art_bottom=150),
         sl(9, N, "מה לוקחים מזה?",
@@ -340,10 +341,10 @@ def simple_story(amount=1000, rate=0.05):
            "<p>נשווה בין שתי שיטות לחשב ריבית על אותו סכום.</p>", top=340),
         sl(3, N, "ריבית פשוטה: איך זה עובד",
            "<p>הריבית מחושבת רק על הסכום המקורי.</p>"
-           f"<p>כל שנה מוסיפים {money(amount * rate)}, בלי שינוי.</p>", sc.tree(0), art_bottom=150, top=380),
+           f"<p>כל שנה מוסיפים {money(amount * rate)}, בלי שינוי.</p>", A.stairs("simple"), art_bottom=150, top=380),
         sl(4, N, "ריבית דריבית: איך זה עובד",
            "<p>הריבית נוספת לקרן, ואז גם עליה מקבלים ריבית.</p>"
-           "<p>כל שנה מוסיפים קצת יותר מהשנה שלפניה.</p>", sc.tree(1), art_bottom=150, top=380),
+           "<p>כל שנה מוסיפים קצת יותר מהשנה שלפניה.</p>", A.stairs("compound"), art_bottom=150, top=380),
         sl(5, N, "אחרי 10 שנים",
            cards(("פשוטה", money(s_(10))), ("דריבית", money(c_(10)))) +
            f"<p>ההפרש עדיין קטן: {money(c_(10) - s_(10))}.</p>", sc.tree(1), art_bottom=150),
@@ -370,7 +371,7 @@ def child_story(pmt=100, rate=0.05):
     f18 = sc.fv_monthly(pmt, rate, 18)
     f40 = f18 * (1 + rate) ** 22
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', hero_art(), art_bottom=150, title_size=84),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.piggy(), art_bottom=150, title_size=84),
         sl(2, N, "ההנחות",
            chips(("הפקדה בחודש", money(pmt)), ("תשואה לדוגמה", f"{rate * 100:.0f}% בשנה"), ("עד גיל", "18")) +
            "<p>הפקדה קטנה וקבועה, בלי לגעת.</p>",
@@ -408,20 +409,20 @@ def raise_story(salary=10000, raise_=0.03, infl=0.04):
     nom = lambda y: salary * (1 + raise_) ** y
     real = lambda y: salary * ((1 + raise_) / (1 + infl)) ** y
     slides = [
-        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', pile(3), art_bottom=150, title_size=84),
+        sl(1, N, title, f'<p style="font-size:46px">{sub}</p>', A.scene_raise(1.34, 0.9), art_bottom=150, title_size=84),
         sl(2, N, "ההנחות",
            chips(("משכורת", money(salary)), ("העלאה בשנה", f"{raise_ * 100:.0f}%"), ("אינפלציה", f"{infl * 100:.0f}% בשנה")) +
            "<p>נשווה בין המספר בתלוש לבין מה שאפשר לקנות איתו.</p>",
            foot="המספרים הם דוגמה. האינפלציה וההעלאות האמיתיות משתנות.", top=340),
         sl(3, N, "אחרי 5 שנים",
            cards(("בתלוש", money(nom(5))), ("בכוח קנייה", money(real(5)))) +
-           "<p>בתלוש יש יותר. בסופר, פחות.</p>", sc.tree(0), art_bottom=150),
+           "<p>בתלוש יש יותר. בסופר, פחות.</p>", A.scene_raise(nom(5) / salary, real(5) / salary), art_bottom=150),
         sl(4, N, "אחרי 10 שנים",
            cards(("בתלוש", money(nom(10))), ("בכוח קנייה", money(real(10)))) +
-           f"<p>בתלוש {money(nom(10))}, אבל בכוח קנייה של היום זה {money(real(10))}.</p>", sc.tree(1), art_bottom=150),
+           f"<p>בתלוש {money(nom(10))}, אבל בכוח קנייה של היום זה {money(real(10))}.</p>", A.scene_raise(nom(10) / salary, real(10) / salary), art_bottom=150),
         sl(5, N, "אחרי 20 שנה",
            cards(("בתלוש", money(nom(20))), ("בכוח קנייה", money(real(20)))) +
-           f"<p>הפער בין המספר בתלוש למה שהוא קונה הולך וגדל.</p>", sc.tree(2), art_bottom=150),
+           f"<p>הפער בין המספר בתלוש למה שהוא קונה הולך וגדל.</p>", A.scene_raise(nom(20) / salary, real(20) / salary), art_bottom=150),
         sl(6, N, "מה המשמעות?",
            f"<p>כשההעלאה ({raise_ * 100:.0f}%) נמוכה מהאינפלציה ({infl * 100:.0f}%), קונים פחות מדי שנה.</p>"
            "<p>גם אם המספר בתלוש גדל.</p>", top=340),
@@ -440,8 +441,12 @@ def raise_story(salary=10000, raise_=0.03, infl=0.04):
 
 
 # ---------------------------------------------------------------- registration
+ICON = {"habit_delivery": "bag", "habit_lunch": "lunch", "habit_streaming": "tv", "habit_gym": "dumbbell",
+        "habit_taxi": "taxi", "habit_apps": "phone", "habit_friday": "cup", "habit_water": "bottle"}
+
+
 def _habit(slug, *a, **k):
-    return slug, (lambda: habit_story(*a, **k))
+    return slug, (lambda: habit_story(*a, icon=ICON[slug], **k))
 
 
 REG = dict([
