@@ -1,12 +1,14 @@
 """Posts the next unposted story carousel from story_cards.STORIES (in order).
 Usage: python content_main.py [--render-only] [--slug SLUG]
 State is kept in posted.json under keys like "story-story_compound"."""
+import hashlib
 import json
 import os
 import sys
 import time
 
 import story_cards as sc
+from money_cards import render
 import story_library  # noqa: F401  (registers all stories in publishing order)
 
 POSTED = "posted.json"
@@ -38,10 +40,15 @@ def main(render_only, slug=None):
     if not slug:
         print("Queue is empty - every story has been published.")
         return
-    m = sc.meta(slug)
-    paths = [os.path.join(OUT, f"{slug}_{i}.png") for i in range(1, m["count"] + 1)]
+    slides, title, sub = sc.STORIES[slug]()
+    m = {"title": title, "sub": sub}
+    # Content-addressed names: edited slides get new URLs, so a CDN never serves a stale image.
+    tag = hashlib.md5("".join(slides).encode("utf-8")).hexdigest()[:8]
+    paths = [os.path.join(OUT, f"{slug}_{tag}_{i}.png") for i in range(1, len(slides) + 1)]
     if render_only or not all(os.path.exists(p) for p in paths):
-        paths = sc.build(OUT, only=[slug])
+        os.makedirs(OUT, exist_ok=True)
+        for path, html in zip(paths, slides):
+            render(html, path)
         print("Rendered:", paths)
     if render_only:
         return
