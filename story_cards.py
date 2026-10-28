@@ -176,6 +176,58 @@ def pile(level):
     return f'<svg viewBox="0 0 1080 440" width="1080" height="440" xmlns="http://www.w3.org/2000/svg">{ground}{body}</svg>'
 
 
+def cup_g(cx, base, k=1.0):
+    """A coffee cup with saucer, centred at cx, standing on y=base, scaled by k."""
+    return (f'<g transform="translate({cx},{base}) scale({k})">'
+            f'<ellipse cx="0" cy="0" rx="190" ry="28" fill="{GROUND}"/>'
+            f'<path d="M-140 -190 L140 -190 L110 -20 Q0 20 -110 -20 Z" fill="#fff"/>'
+            f'<path d="M138 -160 C235 -170 235 -70 118 -72" stroke="#fff" stroke-width="26" fill="none" stroke-linecap="round"/>'
+            f'<ellipse cx="0" cy="-188" rx="140" ry="22" fill="#8A5A3B"/></g>')
+
+
+def svg440(inner):
+    return f'<svg viewBox="0 0 1080 440" width="1080" height="440" xmlns="http://www.w3.org/2000/svg">{inner}</svg>'
+
+
+def cup_and_coin():
+    return svg440(f'<ellipse cx="540" cy="420" rx="620" ry="90" fill="{GROUND}"/>' + cup_g(470, 400, 0.85) +
+                  COIN(720, 372, 44) + COIN(720, 372, 24))
+
+
+def calendar_art():
+    cells = "".join(f'<circle cx="{330 + (i % 7) * 70}" cy="{205 + (i // 7) * 64}" r="17" fill="#8A5A3B"/>'
+                    f'<circle cx="{330 + (i % 7) * 70}" cy="{205 + (i // 7) * 64}" r="7" fill="#fff" opacity=".6"/>'
+                    for i in range(28))
+    return svg440(f'<rect x="270" y="40" width="540" height="380" rx="30" fill="#fff"/>'
+                  f'<path d="M270 70 Q270 40 300 40 L780 40 Q810 40 810 70 L810 110 L270 110 Z" fill="{CORAL}"/>'
+                  f'<rect x="360" y="22" width="16" height="44" rx="8" fill="{INK}"/><rect x="704" y="22" width="16" height="44" rx="8" fill="{INK}"/>'
+                  + cells)
+
+
+def cup_pyramid():
+    out = f'<ellipse cx="540" cy="425" rx="620" ry="90" fill="{GROUND}"/>'
+    for row, n in enumerate((3, 2, 1)):
+        for j in range(n):
+            x = 540 + (j - (n - 1) / 2) * 150
+            out += cup_g(x, 415 - row * 118, 0.36)
+    return svg440(out)
+
+
+def coin_mountain():
+    out = f'<ellipse cx="540" cy="430" rx="640" ry="80" fill="{GROUND}"/>'
+    for row, n in enumerate(range(9, 0, -1)):
+        for j in range(n):
+            out += COIN(540 + (j - (n - 1) / 2) * 50, 408 - row * 34, 25)
+    return svg440(out + cup_g(540, 408 - 8 * 34 - 14, 0.3))
+
+
+def sprout_coin():
+    return svg440(f'<ellipse cx="540" cy="425" rx="620" ry="90" fill="{GROUND}"/>' + COIN(540, 330, 90) + COIN(540, 330, 50) +
+                  f'<path d="M540 240 C540 200 540 175 540 150" stroke="{LEAF}" stroke-width="14" fill="none" stroke-linecap="round"/>'
+                  f'<ellipse cx="500" cy="158" rx="46" ry="24" transform="rotate(-28 500 158)" fill="{LEAF2}"/>'
+                  f'<ellipse cx="584" cy="142" rx="52" ry="26" transform="rotate(26 584 142)" fill="{LEAF}"/>')
+
+
 def coffee_story(price=18, per_year=365, rate=0.07, home=4, home_days_week=3):
     month, year, ten = price * per_year / 12, price * per_year, price * per_year * 10
     grown = fv_monthly(month, rate, 10)
@@ -195,24 +247,24 @@ def coffee_story(price=18, per_year=365, rate=0.07, home=4, home_days_week=3):
         sl(3, N, "ביום ובשבוע זה לא מרגיש",
            cards(("ביום", money(price)), ("בשבוע", money(price * 7))) +
            f"<p>{money(price * 7)} בשבוע. אף אחד לא עוצר על סכום כזה.</p>",
-           pile(1), art_bottom=150),
+           cup_and_coin(), art_bottom=150),
         sl(4, N, "בחודש כבר מתחילים להרגיש",
            cards(("בחודש", money(month)), ("בשנה", money(year))) +
            f"<p>{money(month)} בחודש. ובשנה כבר {money(year)}, על משהו שאפשר לשתות בלי לחשוב.</p>",
-           pile(2), art_bottom=150),
+           calendar_art(), art_bottom=150),
         sl(5, N, "בשלוש שנים זה כבר סכום",
            cards(("אחרי שנה", money(year)), ("אחרי 3 שנים", money(year * 3))) +
            f"<p>{money(year * 3)} על קפה. אותו הרגל, רק עם יותר אפסים.</p>",
-           pile(3), art_bottom=150),
+           cup_pyramid(), art_bottom=150),
         sl(6, N, "בעשר שנים מגיע המספר",
            cards(("אחרי 10 שנים", money(ten)), ("בממוצע בשנה", money(year))) +
            f"<p>{money(ten)}. זה הסכום שעבר מהכיס שלך לבית הקפה, בלי שהרגשת.</p>",
-           pile(4), art_bottom=150),
+           coin_mountain(), art_bottom=130),
         sl(7, N, "ואם הכסף הזה היה עובד?",
            cards(("הפקדת", money(ten)), ("יש לך", money(grown))) +
            f"<p>אם היית מפקיד את אותו סכום כל חודש, בתשואה לדוגמה של {rate * 100:.0f}% בשנה, "
            f"הריבית הייתה מוסיפה {money(grown - ten)}.</p>",
-           foot="התשואה היא דוגמה, לא הבטחה. 7% בשנה היא הנחה אופטימית, ובפועל יכולות להיות גם שנים של הפסד."),
+           sprout_coin(), art_bottom=210, foot="התשואה היא דוגמה, לא הבטחה. 7% בשנה היא הנחה אופטימית, ובפועל יכולות להיות גם שנים של הפסד."),
         sl(8, N, "אפשר גם בלי לוותר על הכול",
            f"<p>אם מחליפים רק {home_days_week} ימים בשבוע בקפה בבית שעולה {home} שקלים, חוסכים בערך "
            f"<b style='font-weight:800'>{money(save)}</b> בשנה.</p>"
