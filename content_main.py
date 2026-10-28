@@ -7,6 +7,7 @@ import sys
 import time
 
 import story_cards as sc
+import story_library  # noqa: F401  (registers all stories in publishing order)
 
 POSTED = "posted.json"
 OUT = "out/story"

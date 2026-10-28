@@ -1,8 +1,7 @@
 name: daily-money-carousel
 on:
-  # schedule is switched on only after the first approved post:
-  # schedule:
-  #   - cron: "0 16 * * *"   # 16:00 UTC daily (~18:00-19:00 Israel)
+  schedule:
+    - cron: "0 16 * * *"   # 16:00 UTC daily (18:00-19:00 Israel): posts the next story in the queue
   workflow_dispatch:
 permissions:
   contents: write
