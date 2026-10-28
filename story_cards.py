@@ -176,7 +176,7 @@ def pile(level):
     return f'<svg viewBox="0 0 1080 440" width="1080" height="440" xmlns="http://www.w3.org/2000/svg">{ground}{body}</svg>'
 
 
-def coffee_story(price=18, per_year=365, rate=0.04, home=4, home_days_week=3):
+def coffee_story(price=18, per_year=365, rate=0.07, home=4, home_days_week=3):
     month, year, ten = price * per_year / 12, price * per_year, price * per_year * 10
     grown = fv_monthly(month, rate, 10)
     save = home_days_week * (per_year / 7) * (price - home)
@@ -212,7 +212,7 @@ def coffee_story(price=18, per_year=365, rate=0.04, home=4, home_days_week=3):
            cards(("הפקדת", money(ten)), ("יש לך", money(grown))) +
            f"<p>אם היית מפקיד את אותו סכום כל חודש, בתשואה לדוגמה של {rate * 100:.0f}% בשנה, "
            f"הריבית הייתה מוסיפה {money(grown - ten)}.</p>",
-           foot="התשואה היא דוגמה, לא הבטחה. בפועל היא משתנה, ויכולות להיות גם שנים של הפסד."),
+           foot="התשואה היא דוגמה, לא הבטחה. 7% בשנה היא הנחה אופטימית, ובפועל יכולות להיות גם שנים של הפסד."),
         sl(8, N, "אפשר גם בלי לוותר על הכול",
            f"<p>אם מחליפים רק {home_days_week} ימים בשבוע בקפה בבית שעולה {home} שקלים, חוסכים בערך "
            f"<b style='font-weight:800'>{money(save)}</b> בשנה.</p>"
