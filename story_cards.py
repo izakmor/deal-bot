@@ -115,7 +115,7 @@ def compound_story(pmt=500, rate=0.05):
     sub = "סיפור ב־9 שקופיות: מה קורה לחיסכון קטן כשנותנים לו זמן."
     slides = [
         slide(1, N, f"איך {pmt} שקלים בחודש נהיים {f30 / 1000:.0f} אלף שקלים",
-              f'<p style="font-size:46px">והסוד הוא לא להרוויח יותר. הוא להתחיל, ולהמשיך.</p>', hero_art(), art_bottom=150, title_size=100),
+              f'<p style="font-size:46px">הסוד הוא לא להרוויח יותר. הוא להתחיל, ולהמשיך.</p>', hero_art(), art_bottom=150, title_size=100),
         slide(2, N, "קודם, ההנחות",
               chips(("הפקדה בחודש", money(pmt)), ("תשואה לדוגמה", f"{rate * 100:.0f}% בשנה"), ("תקופה", "30 שנה")) +
               "<p>אין כאן מזל ואין תזמון שוק. אותו סכום, כל חודש, ולא נוגעים בו.</p>"
@@ -185,7 +185,7 @@ def coffee_story(price=18, per_year=365, rate=0.07, home=4, home_days_week=3):
     title = "כמה הקפה של הבוקר עולה לך באמת?"
     sub = "סיפור ב־9 שקופיות: מה קורה להרגל של 18 שקלים ביום."
     slides = [
-        sl(1, N, title, '<p style="font-size:46px">18 שקלים ביום. נשמע כלום. בוא נראה את המספר המלא.</p>',
+        sl(1, N, title, '<p style="font-size:46px">18 שקלים ביום. נשמע כלום. נראה את המספר המלא.</p>',
            cup_art(), art_bottom=150, title_size=100),
         sl(2, N, "קודם, ההנחות",
            chips(("מחיר קפה", money(price)), ("כמה פעמים", "כל יום"), ("תקופה", "10 שנים")) +
@@ -194,7 +194,7 @@ def coffee_story(price=18, per_year=365, rate=0.07, home=4, home_days_week=3):
            foot="הנתונים הם דוגמה. כל אחד ישנה אותם לפי ההרגל שלו.", top=340),
         sl(3, N, "ביום ובשבוע זה לא מרגיש",
            cards(("ביום", money(price)), ("בשבוע", money(price * 7))) +
-           f"<p>{money(price * 7)} בשבוע זה פחות מארוחה אחת במסעדה. אף אחד לא עוצר על זה.</p>",
+           f"<p>{money(price * 7)} בשבוע. אף אחד לא עוצר על סכום כזה.</p>",
            pile(1), art_bottom=150),
         sl(4, N, "בחודש כבר מתחילים להרגיש",
            cards(("בחודש", money(month)), ("בשנה", money(year))) +

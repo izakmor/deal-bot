@@ -236,6 +236,7 @@ def render(html, out):
         f = os.path.join(td, "s.html")
         open(f, "w", encoding="utf-8").write(html)
         subprocess.run([find_browser(), "--headless=new", "--disable-gpu", "--hide-scrollbars",
+                        f"--user-data-dir={os.path.join(td, 'profile')}",
                         "--window-size=1080,1350", "--virtual-time-budget=10000",
                         f"--screenshot={os.path.abspath(out)}", "file:///" + f.replace("\\", "/")],
                        check=True, timeout=120, capture_output=True)

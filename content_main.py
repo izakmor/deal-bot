@@ -45,7 +45,8 @@ def main(render_only, slug=None):
         print("Rendered:", paths)
     if render_only:
         return
-    from publish import post_carousel
+    from publish import check_token, post_carousel
+    check_token()
     time.sleep(20)  # let raw.githubusercontent.com serve the freshly pushed images
     base = os.environ["IMAGE_BASE_URL"]
     post_id = post_carousel([f"{base}/story/{os.path.basename(p)}" for p in paths], caption(m))

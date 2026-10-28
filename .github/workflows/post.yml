@@ -3,6 +3,10 @@ on:
   schedule:
     - cron: "0 16 * * *"   # 16:00 UTC daily (18:00-19:00 Israel): posts the next story in the queue
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "true = render and check only, do not post"
+        default: "false"
 permissions:
   contents: write
 jobs:
@@ -14,6 +18,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
+      - name: Check story text (stops before posting if a known mistake is found)
+        run: python lint_stories.py
       - name: Render the carousel and commit the images (gives them a public URL)
         run: |
           python content_main.py --render-only
@@ -21,13 +27,22 @@ jobs:
           git config user.email "money-bot@users.noreply.github.com"
           git add out && git commit -m "carousel images" || true
           git push || true
+      - name: Check Instagram token
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: python -c "from publish import check_token; check_token()"
       - name: Post to Instagram
+        if: ${{ github.event.inputs.dry_run != 'true' }}
         env:
           IG_USER_ID: "17841415780467671"
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IMAGE_BASE_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/out
         run: python content_main.py
       - name: Save posted list
+        if: always()
         run: |
           git add posted.json && git commit -m "posted" || true
           git push || true
+      - name: Token renewal reminder (fails the run so GitHub emails you)
+        run: |
+          if [ -f token_warning ]; then echo "::error::Instagram token is $(cat token_warning) days old. Renew it and update token_issued.txt."; exit 1; fi
